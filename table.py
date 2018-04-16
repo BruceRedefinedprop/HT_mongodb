@@ -10,11 +10,11 @@ DATA_SAMPLE = [
 
 
 DATA_SAMPLE_RENT = [
-    {'st_date' :'1/1/2017', 'end_data' : '12/31/2017', 'monthly_rent': 10000 }, 
-    {'st_date' :'1/1/2018', 'end_data' : '12/31/2018', 'monthly_rent': 11000 },
-    {'st_date' :'1/1/2019', 'end_data' : '12/31/2019', 'monthly_rent': 12000 },
-    {'st_date' :'1/1/2020', 'end_data' : '12/31/2020', 'monthly_rent': 13000 },
-    {'st_date' :'1/1/2021', 'end_data' : '12/31/2021', 'monthly_rent': 14000 }
+    {'id':1, 'st_date' :'1/1/2017', 'end_data' : '12/31/2017', 'monthly_rent': 10000 }, 
+    {'id':2,'st_date' :'1/1/2018', 'end_data' : '12/31/2018', 'monthly_rent': 11000 },
+    {'id':3,'st_date' :'1/1/2019', 'end_data' : '12/31/2019', 'monthly_rent': 12000 },
+    {'id':3,'st_date' :'1/1/2020', 'end_data' : '12/31/2020', 'monthly_rent': 13000 },
+    {'id':5,'st_date' :'1/1/2021', 'end_data' : '12/31/2021', 'monthly_rent': 14000 }
     ]
 
 
