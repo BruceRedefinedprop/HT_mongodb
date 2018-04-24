@@ -1,46 +1,45 @@
 
 var editor;
 
+
 $(document).ready(function() {
 
     editor = new $.fn.dataTable.Editor({
-      "idSrc": "id",
+      "idSrc": "_id",
       "table": "#bldg_list",
       "fields": [{
-        "label": "Start Date",
-        "name": "st_date"
-      }, {
-        "label": "End Date",
-        "name": "end_data"
-      }, {
-        "label": "Monthly Rent",
-        "name": "monthly_rent"
+        "label": "Name",
+        "name": "name"
       }]
     });
 
     $('#bldg_list').DataTable({
       ajax: "/bldg_list_data",
-      // data: data.data,
       paging: true,
-      dom: 'Bfrtip',
+      // dom: 'Bfrtip',
       columns: [
-        { "data": "id", "title": "ID" },
-        { "data": "st_date", "title": "Start Date" },
-        { "data": "end_data", "title": "End Date" },
-        { "data": "monthly_rent", "title": "Monthly Rent" },
-      ],
-      columnDefs: [
-        { targets: [1, 2, 3], visible: true },
-        { targets: [0], visible: false }
+        // { "data": "_id", "title": "ID" },
+        { "data": "name", "title": "Name" }
       ],
       select: true,
-      buttons: [
-        { extend: "create", editor: editor },
-        { extend: "edit", editor: editor },
-        { extend: "remove", editor: editor }
-      ]
+      
 
     });
 
+    $('#bldg_add_btn').on( 'click',    function() {
+      var table = $('#bldg_list').DataTable();
+      var data = table.row({ selected: true }).data()
+      // console.log(JSON.stringify(data))
+      alert(JSON.stringify(data))
+      $.ajax({
+          url: '/bldg_edit',
+          data: JSON.stringify(data),
+          type: 'POST',
+          contentType: "application/json; charset=utf-8",
+          success: function() {
+            // window.location.href = "/";
+          }
+      });
+   });
 
 });

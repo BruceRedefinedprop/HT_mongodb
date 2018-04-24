@@ -19,6 +19,7 @@ def home():
 def dbtest():
     table_builder = TableBuilder()
     data = table_builder.collect_data_clientside()
+    print(data)
     return jsonify(data)
     
 @app.route('/changed_data', methods=['POST', 'GET'])
