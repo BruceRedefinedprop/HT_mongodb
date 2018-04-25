@@ -4,7 +4,7 @@ from flask import Flask, render_template, redirect, request, url_for, jsonify, s
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from bson.json_util import dumps, loads
-from table import TableBuilder
+from helper import TableBuilder
 
 
 app = Flask(__name__)
@@ -31,6 +31,9 @@ def propertyhome():
 # construct building list
 @app.route('/bldg_list_data')
 def bldg_list_data():
+    session['status'] = "idle"
+    session['bldgData'] = ""
+    session['bldgEdit'] = ""
     bldg = mongo.db.building.find()
     print('bldg list')
     print(bldg.count())
@@ -43,9 +46,28 @@ def bldg_list_data():
 @app.route('/bldg_edit', methods=['POST', 'GET'])
 def recv_data():
     data = request.get_json() 
-    print("received ajax data")
-    print(data)
-    return redirect('bldg_list_data')
+    # print("received ajax data")
+    # print(data)
+    # print(type(data))
+    bldgEdit = mongo.db.building.find_one({"_id": ObjectId(data['_id']["$oid"])})
+    # print('retrieved record')
+    # print(bldgEdit)
+    name = bldgEdit['name']
+    # print(name)
+    # print("city" in bldgEdit)
+    table_builder = TableBuilder()
+    bldgData = table_builder.collect_template_bldging()
+    session['bldgData'] = bldgData
+    del bldgEdit['_id']
+    session['bldgEdit'] = bldgEdit
+    session['status'] = "editing"
+    return redirect(url_for("bldg_edit_form"))
+
+@app.route('/bldg_edit_form', methods=['POST', 'GET'])
+def bldg_edit_form():
+    return render_template("bldg_edit_form.html")
+    
+    
 
     
 @app.route('/bldg_new', methods=["POST"])

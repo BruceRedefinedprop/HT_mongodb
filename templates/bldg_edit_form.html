@@ -1,0 +1,90 @@
+ {% extends 'base.html'%} {% block content %}
+
+<div class="container">
+    <h2 class="header ">Building Form</h2>
+    <div class="row">
+        <form action="{{ url_for('bldg_new') }}" method="POST" class="col s12">
+            <h4>Location</h4>
+            <div class="row">
+                <div class="input-field col s12">
+                    <input id="bldg_name" name="bldg_name" type="text">
+                    <label>Property name</label>
+                </div>
+                <div class="input-field col s12">
+                    <input id="bldg_street" name="bldg_street" type="text">
+                    <label>Street</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s5">
+                    <input id="bldg_town" name="bldg_town" type="text">
+                    <label>City</label>
+                </div>
+                <div class="input-field col s3">
+                    <input id="bldg_st" name="bldg_st" type="text">
+                    <label>St. </label>
+                </div>
+                <div class="input-field col s4">
+                    <input id="bldg_zip" name="bldg_zip" type="text">
+                    <label>Zip</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s4">
+                    <input id="bldg_page" name="bldg_page" type="text">
+                    <label>Zip</label>
+                </div>
+                <div class="input-field col s4">
+                    <input id="bldg_lot" name="bldg_lot" type="text">
+                    <label>Block</label>
+                </div>
+                <div class="input-field col s4">
+                    <input id="bldg_lot" name="bldg_block" type="text">
+                    <label>Block</label>
+                </div>
+            </div>
+            <hr>
+            <h4>Type and Size</h4>
+            <div class="row">
+                <div class="input-field col s4">
+                    <input id="bldg_gla" name="bldg_gla" type="text">
+                    <label>GLA (sf)</label>
+                </div>
+                <div class="input-field col s4">
+                    <input id="bldg_land" name="bldg_land" type="text">
+                    <label>Land (acre)</label>
+                </div>
+                <div class="input-field col s4">
+                    <select>
+                      <option value="" disabled selected>Choose your option</option>
+                      <option value="1">Industrial</option>
+                      <option value="2">Mixed Use</option>
+                      <option value="3">Retail</option>
+                    </select>
+                    <label>Type</label>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+
+    <div class="row">
+        <button class="btn waves-effect waves-light" type="submit" value="update" name="action">Update
+                    <i class="material-icons right">playlist_add</i>
+        </button>
+        <button class="btn waves-effect waves-light" type="submit" value="cancel" name="action">Cancel
+                    <i class="material-icons right">playlist_add</i>
+        </button>
+        <button class="btn waves-effect waves-light" type="submit" value="exit" name="action">Exit
+                    <i class="material-icons right">playlist_add</i>
+        </button>
+    </div>
+    </form>
+</div>
+
+</div>
+
+
+{% endblock %}
+ 

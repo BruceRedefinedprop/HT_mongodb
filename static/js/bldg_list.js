@@ -26,7 +26,7 @@ $(document).ready(function() {
 
     });
 
-    $('#bldg_add_btn').on( 'click',    function() {
+    $('#bldg_edit_btn').on( 'click',    function() {
       var table = $('#bldg_list').DataTable();
       var data = table.row({ selected: true }).data()
       // console.log(JSON.stringify(data))
@@ -37,7 +37,7 @@ $(document).ready(function() {
           type: 'POST',
           contentType: "application/json; charset=utf-8",
           success: function() {
-            // window.location.href = "/";
+            window.location.href = "/bldg_edit_form";
           }
       });
    });
