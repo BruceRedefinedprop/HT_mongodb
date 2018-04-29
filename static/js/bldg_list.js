@@ -1,7 +1,6 @@
 
 var editor;
 
-
 $(document).ready(function() {
 
     editor = new $.fn.dataTable.Editor({
@@ -16,7 +15,7 @@ $(document).ready(function() {
     $('#bldg_list').DataTable({
       ajax: "/bldg_list_data",
       paging: true,
-      // dom: 'Bfrtip',
+      dom: 'Bfrtip',
       columns: [
         // { "data": "_id", "title": "ID" },
         { "data": "name", "title": "Name" }
@@ -41,5 +40,4 @@ $(document).ready(function() {
           }
       });
    });
-
 });

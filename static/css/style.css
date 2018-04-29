@@ -12,3 +12,27 @@
 .icon-block .material-icons {
 	font-size: inherit;
 }
+
+#purchase {
+    display: none;
+}
+
+#tenants {
+    display: none;
+}
+
+#tenant {
+    display: none;
+}
+
+#rent {
+    display: none;
+}
+
+#expenses {
+    display: none;
+}
+
+#capital {
+    display: none;
+}
