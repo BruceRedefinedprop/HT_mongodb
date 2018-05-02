@@ -1,6 +1,6 @@
 
 BLDGING = {
-    'name': "",
+    'name': "test",
     'street': "" ,
     'town': "",
     'st' : '',

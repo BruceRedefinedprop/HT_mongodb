@@ -22,8 +22,15 @@ If collection is empty, redirect to creating a new record.
 bldg_list_html creates of building to choose from.
 
 """
+@app.route('/base')
+def base():
+    render_template('base.html')
+
+
 @app.route('/')
 def propertyhome():
+    session["record_status"] = "home"
+    session['newdata'] = ""
     print("index page")
     bldg = mongo.db.building.find()
     print(bldg.count())
@@ -32,69 +39,59 @@ def propertyhome():
         print("no data in db")
         return redirect(url_for("bldg_new"))
     return render_template("bldg_list.html")
-
-# bgdg_list.html is lauched above.  bldg_list.html, when launched, 
-# loads static/js/bldg_list.js, which builds the datatable for property list 
-# when Add button is pressed, goes to url /bldg_new 
-
-#/bldg_new retrieves a blank template record helper.py
-#that template is sent to bldg_edit_form.html.
-# not sure it's necessary.
-
-@app.route('/bldg_new')
-def bldg_new():
-    table_builder = TableBuilder()
-    data = table_builder.collect_template_bldging()
-    session["record_status"] = "new"
-    session['newdata'] = data
-    print("new building ....")
-    # # print(request.form['bldg_name'])
-    # building = mongo.db.building
-    # building_doc = {'name': request.form['bldg_name']}
-    # building.insert_one(building_doc)
-    return render_template("bldg_edit_form.html", bldgData=data, status="new")
     
-
-
+    
 @app.route('/bldg_list_data')
 def bldg_list_data():
     session['status'] = "idle"
-    # session['bldgData'] = ""
-    # session['bldgEdit'] = ""
     bldg = mongo.db.building.find()
     print('bldg list')
     temp = list(bldg)
     table = {'data': temp}
     print(table)
     return dumps(table)
+    
+
+# bldg_list.html is lauched above.  bldg_list.html, when launched, 
+# loads static/js/bldg_list.js, which builds the datatable for property list 
+# when Add button is pressed, goes to url /bldg_new 
+# When bldg_list.html, it launches bldg_list.js which builds Datatable of building names
+# Datatable uses a AJAX get from /bldg_list_data to pull Mongo DB.   Datatable filters the list
+# the JS file.
 
 
+#/bldg_new retrieves a blank template record helper.py
+#that template is sent to bldg_edit_form.html.
+# not sure it's necessary.
 
-
-
-
-
-
-@app.route('/bldg_edit', methods=['POST', 'GET'])
-def recv_data():
-    data = request.get_json() 
-    # print("received ajax data")
-    # print(data)
-    # print(type(data))
-    bldgEdit = mongo.db.building.find_one({"_id": ObjectId(data['_id']["$oid"])})
-    # print('retrieved record')
-    # print(bldgEdit)
-    name = bldgEdit['name']
-    # print(name)
-    # print("city" in bldgEdit) 
+@app.route('/bldg_new' , methods=['POST', 'GET'])
+def bldg_new():
     table_builder = TableBuilder()
-    bldgData = table_builder.collect_template_bldging()
-    session['bldgData'] = bldgData
-    del bldgEdit['_id']
-    session['bldgEdit'] = bldgEdit
-    session['status'] = "editing"
-    return render_template("bldg_edit_form")
+    data = table_builder.collect_template_bldging()
+    session["record_status"] = "new"
+    session['newdata'] = data
+    print("new building ....")
+    return render_template("bldg_edit_form.html", bldgData=data, status="new")
+    
+# when the save & exit on  bldg_form_html is pressed, an JSON file new record's collected data, the jsBldgData array
+# is sent to /bldg_new/data via AJAX     
 
+@app.route("/bldg_new/data" , methods=['POST', 'GET'])    
+def bldg_new_result():
+    data = request.get_json()
+    print("ajax data recieved...")
+    print(dumps(data))
+    building = mongo.db.building
+    building.insert_one(data)
+    print("data inserted...")
+    return render_template("bldg_list.html")
+    
+# In the bldg_edit_form, to populate the various datatable, we need to pull data
+# from the various data records.   The session{'data'] variable is set in bldg_new() view function
+# when the data record is created.  The view functions below used below to pass via
+# ajax, data back to clientside to populate the tables.  Due to particulars of DataTable
+# data needs to be reformated with id required by DataTables' Editor and put into proper 
+# dictionary format.
 
 @app.route('/cap_data')
 def cap_data():  
@@ -128,9 +125,26 @@ def expense_data():
     table = {'data': temp}
     print(table)
     return dumps(table)
+    
+# Retrieve and Edit database info.    
 
+# @app.route('/bldg_edit', methods=['GET', 'POST'])
+@app.route('/bldg_edit/data', methods=['POST'])
+def bldg_edit_data():
+    data = request.get_json()
+    print("received edit ajax data")
+    print(data)
+    print(type(data))
+    print(data['_id'])
+    bldgEdit = mongo.db.building.find_one({"_id": ObjectId(data['_id']["$oid"])})
+    print("bldgEdit ...")
+    print(bldgEdit)
+    session['bldgEdit'] = bldgEdit
+    return redirect(url_for("base"))
       
-   
+# @app.route('/bldg_edit') 
+# def bldg_edit():
+#       render_template("base.html")
     
 
 if __name__ == '__main__':

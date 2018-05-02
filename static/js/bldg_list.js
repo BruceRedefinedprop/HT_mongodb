@@ -31,12 +31,12 @@ $(document).ready(function() {
       // console.log(JSON.stringify(data))
       alert(JSON.stringify(data))
       $.ajax({
-          url: '/bldg_edit',
+          url: '/bldg_edit/data',
           data: JSON.stringify(data),
           type: 'POST',
           contentType: "application/json; charset=utf-8",
           success: function() {
-            window.location.href = "/bldg_edit_form";
+            // window.location.href = "/bldg_edit";
           }
       });
    });
