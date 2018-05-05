@@ -1,6 +1,6 @@
 
 BLDGING = {
-    'name': "test",
+    'name': "railroad-flats",
     'street': "" ,
     'town': "",
     'st' : '',

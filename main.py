@@ -22,19 +22,18 @@ If collection is empty, redirect to creating a new record.
 bldg_list_html creates of building to choose from.
 
 """
-@app.route('/base')
-def base():
-    render_template('base.html')
+
 
 
 @app.route('/')
 def propertyhome():
     session["record_status"] = "home"
     session['newdata'] = ""
+    session['bldgEditID'] = ""
     print("index page")
     bldg = mongo.db.building.find()
     print(bldg.count())
-    print(dumps(bldg))
+    # print(dumps(bldg))
     if bldg.count() == 0:
         print("no data in db")
         return redirect(url_for("bldg_new"))
@@ -48,7 +47,7 @@ def bldg_list_data():
     print('bldg list')
     temp = list(bldg)
     table = {'data': temp}
-    print(table)
+    # print(table)
     return dumps(table)
     
 
@@ -127,25 +126,27 @@ def expense_data():
     return dumps(table)
     
 # Retrieve and Edit database info.    
-
-# @app.route('/bldg_edit', methods=['GET', 'POST'])
-@app.route('/bldg_edit/data', methods=['POST'])
-def bldg_edit_data():
-    data = request.get_json()
-    print("received edit ajax data")
+@app.route('/bldg_edit', methods = ["POST"] )
+def bldg_edit():
+    print('data received from list page ...')
+    data = request.form['bldg_id']
     print(data)
-    print(type(data))
-    print(data['_id'])
-    bldgEdit = mongo.db.building.find_one({"_id": ObjectId(data['_id']["$oid"])})
-    print("bldgEdit ...")
+    if data == "":
+        return redirect(url_for("propertyhome"))
+    dbData = mongo.db.building.find_one({"_id": ObjectId(data)})
+    bldgEdit = dbData
+    print('returns mongo record')
     print(bldgEdit)
-    session['bldgEdit'] = bldgEdit
-    return redirect(url_for("base"))
+    if 'submit_save' in request.form:  #test code
+        print("found submit save button")
+    return render_template("/bldg_update.html", data= bldgEdit)
+
+
+
+
+
       
-# @app.route('/bldg_edit') 
-# def bldg_edit():
-#       render_template("base.html")
-    
+
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),

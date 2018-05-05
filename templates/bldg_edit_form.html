@@ -27,7 +27,7 @@
                     <h4>Info</h4>
                     <div class="row">
                         <div class="input-field col s12">
-                            <input id="bldg_name" name="bldg_name" type="text" value={{ bldgData.name }}>
+                            <input id="bldg_name" name="bldg_name" type="text" value= {{bldgData.name}}>
                             <label>Property name</label>
                         </div>
                         <div class="input-field col s12">
@@ -173,7 +173,7 @@
                 <div class="row" id="editform_bottom_btns">
                     <a class="waves-effect waves-light btn-small type="submit" id="newbldgSaveBtn" value="save" name="action"">Save</a>
                     <a class="waves-effect waves-light btn-small type="submit" id="newbldgSaveExitBtn" value="save" name="action"">Save & Exit</a>
-                    <a class="waves-effect waves-light btn-small type="submit" value="exit" name="action"">Cancel</a>
+                    <a href='\'  class="waves-effect waves-light btn-small type="submit" value="exit" name="action"">Cancel</a>
                 </div>
             </form>
         </div>
@@ -183,5 +183,10 @@
 
     <script type="text/javascript" src="static/js/bldgedit.js"></script>
 
+    <script>
+ $("h3").append("{{ bldgData.name }}");
+ </script>
+
+ 
     {% endblock %}
  

@@ -25,19 +25,13 @@ $(document).ready(function() {
 
     });
 
-    $('#bldg_edit_btn').on( 'click',    function() {
+    $('#bldg_list').on( 'click',    function() {
       var table = $('#bldg_list').DataTable();
-      var data = table.row({ selected: true }).data()
-      // console.log(JSON.stringify(data))
-      alert(JSON.stringify(data))
-      $.ajax({
-          url: '/bldg_edit/data',
-          data: JSON.stringify(data),
-          type: 'POST',
-          contentType: "application/json; charset=utf-8",
-          success: function() {
-            // window.location.href = "/bldg_edit";
-          }
-      });
+      var row = table.row({ selected: true }).data();
+      var data = row["_id"]['$oid'];
+      alert(JSON.stringify(data));
+      $("#bldg_id").val(data) ;
+       
    });
+   
 });
