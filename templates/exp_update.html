@@ -1,0 +1,57 @@
+ {% extends 'base.html'%} {% block content %}
+
+
+
+<h3 class="header"> Expenses Update</h3>
+<!--tabs-->
+<div class="container" id="exp_edit_tabs">
+    <div class="row">
+        <a href="/bldg_update" class="waves-effect waves-teal btn-flat" id="infoTab">Info</a>
+        <a class="waves-effect waves-teal btn-flat" id="purchaseTab">Acquisition</a>
+        <a class="waves-effect waves-teal btn-flat" id="tenantsTab">Tenants</a>
+        <a class="waves-effect waves-teal btn-flat" id="expenseTab">Expenses</a>
+        <a class="waves-effect waves-teal btn-flat" id="capitalTab">Capital</a>
+    </div>
+    <hr>
+</div>
+
+
+
+<div class="container">
+    <div class="row">
+        <form method="POST" "{{ url_for('next_update') }}" name="exp_formsave" class="col s12">
+            <div class="row" id="info">
+                
+                <div class="row">
+                    <div class="input-field col s12">
+                        <input id="bldg_id" type="hidden" name="bldg_id" value={{ data._id }}>
+                        <h5>{{data.name }}</h5>
+                    </div>
+                </div>
+                <div class="row">
+                    
+                    <div class="table_container">
+                        <table id="exp_update_list" class="display" style="width:70%"></table>
+                       
+                    </div>
+                </div>
+                
+
+            </div>
+            <div class="row" id="editform_bottom_btns">
+                <button class="btn waves-effect waves-light" type="submit" name="exp_formsave">Save 
+                    <i class="material-icons right">playlist_add</i>
+                 </button>
+                <!--<a class="waves-effect waves-light btn-small type=" submit " id="newbldgSaveBtn "  name="acq_formsave "">Save</a>-->
+                <a class="waves-effect waves-light btn-small type=" submit " id="newbldgSaveExitBtn "  name="action "">Save & Exit</a>
+                <a href="/" class="waves-effect waves-light btn-small type=" submit "  name="action "">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+</div>
+<script type="text/javascript" src="static/js/capUpdate.js"></script>
+
+
+{% endblock %}
+ 

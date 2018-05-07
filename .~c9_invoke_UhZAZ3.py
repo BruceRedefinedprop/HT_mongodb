@@ -30,7 +30,6 @@ def propertyhome():
     session["record_status"] = "home"
     session['newdata'] = ""
     session['bldgEditID'] = ""
-    session['editdata'] = ""
     print("index page")
     bldg = mongo.db.building.find()
     print(bldg.count())
@@ -105,45 +104,6 @@ def cap_data():
     table = getTableData(temp)
     return dumps(table)
 
-@app.route('/cap_data_edit' )
-def cap_data_edit(): 
-    capdata = session['editdata']
-    print('recieved capdata...')
-    print(capdata)
-    if session['editdata'] == "":
-        return redirect(url_for("propertyhome"))
-    temp = list(capdata)
-    table = {'data': capdata}
-    # table = getTableData(capdata)
-    print(table)
-    return dumps(table)
-
-@app.route('/exp_data_edit' )
-def exp_data_edit(): 
-    expdata = session['editdata']
-    print('recieved expdata...')
-    print(expdata)
-    if session['editdata'] == "":
-        return redirect(url_for("propertyhome"))
-    temp = list(expdata)
-    table = {'data': expdata}
-    print(table)
-    return dumps(table)
-
-@app.route('/tenants_data_edit' )
-def tenants_data_edit(): 
-    tenantsdata = session['editdata']
-    print('recieved tenantsdata...')
-    print(tenantsdata)
-    if session['editdata'] == "":
-        return redirect(url_for("propertyhome"))
-    temp = list(tenantsdata)
-    table = {'data': tenantsdata}
-    print(table)
-    return dumps(table)
-
-
-
 @app.route('/tenants_data')
 def tenants_data():  
     data = session['newdata']
@@ -206,31 +166,10 @@ def next_update():
     bldgEdit = dbData
     print('returns mongo record')
     print(bldgEdit)
-    if 'info_formsave' in request.form:  #test code
-        print("found acqusition submit save button")
+    if 'bldg_list.html' in request.form:  #test code
+        print("found submit save button")
         return render_template("/acq_update.html", data= bldgEdit)
-    elif 'acq_formsave' in request.form:
-        print("found capital submit save button")
-        if "improvements" in bldgEdit:
-            session['editdata'] = bldgEdit['improvements']
-        else:
-            session['editdata'] = []
-        return render_template("/cap_update.html", data= bldgEdit)
-    elif 'cap_formsave' in request.form:
-        print("found expense submit save button")
-        if "expense" in bldgEdit:
-            session['editdata'] = bldgEdit['expense']
-        else:
-            session['editdata'] = []
-        return render_template("/exp_update.html", data= bldgEdit)
-    elif 'exp_formsave' in request.form:
-        print("found expense submit save button")
-        if "tenants" in bldgEdit:
-            session['editdata'] = bldgEdit['tenants']
-        else:
-            session['editdata'] = []
-        return render_template("/tenants_update.html", data= bldgEdit)    
-    else:    
+    else:
         print("wrong sumbit button")
         return render_template("/bldg_list.html")
     return    
