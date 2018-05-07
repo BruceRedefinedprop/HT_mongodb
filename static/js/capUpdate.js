@@ -1,4 +1,8 @@
 $(document).ready(function() {
+
+    $('#tenants_update').show();
+    $('#rent_update').hide();
+
     var capEditor;
     capEditor = new $.fn.dataTable.Editor({
         "idSrc": "id",
@@ -78,6 +82,38 @@ $(document).ready(function() {
         ]
     });
 
+    var tenantsEditor;
+    tenantsEditor = new $.fn.dataTable.Editor({
+        "idSrc": "id",
+        "table": "#tenants_list",
+        "fields": [{
+                "label": "Nane",
+                "name": "tenant_name"
+            },
+            {
+                "label": "GLA",
+                "name": "leased_space"
+            }
+
+        ]
+    });
+
+    $('#tenants_list').DataTable({
+        ajax: "/tenants_data_edit",
+        // paging: false,
+        dom: 'Bfrtip',
+        columns: [
+            { "data": "tenant_name", "title": "Name" },
+            { "data": "leased_space", "title": "GLA" },
+        ],
+
+        select: true,
+        buttons: [
+            { extend: "create", editor: tenantsEditor },
+            { extend: "edit", editor: tenantsEditor },
+            { extend: "remove", editor: tenantsEditor }
+        ]
+    });
 
 
 });
