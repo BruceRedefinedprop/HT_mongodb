@@ -101,7 +101,7 @@ $(document).ready(function() {
     var tenantsEditor;
     tenantsEditor = new $.fn.dataTable.Editor({
         "idSrc": "id",
-        "table": "#tenants_list",
+        "table": "#tenants_udpate_list",
         "fields": [{
                 "label": "Nane",
                 "name": "tenant_name"
@@ -114,7 +114,7 @@ $(document).ready(function() {
         ]
     });
 
-    $('#tenants_list').DataTable({
+    $('#tenants_udpate_list').DataTable({
         ajax: "/tenants_data_edit",
         // paging: false,
         dom: 'Bfrtip',
@@ -134,17 +134,18 @@ $(document).ready(function() {
 
 
     $("#rent_tnt_btn").on('click', function()  {
-        jsBldgData['tenants'] = makeTenantArray('#tenants_list');
+        jsBldgData['tenants'] = makeTenantArray('#tenants_udpate_list');
         console.log("tenant btn pressed");
         var tenentsdata = {};
-        var table = $('#tenants_list').DataTable();
+        var table = $('#tenants_udpate_list').DataTable();
         tenantnamedata = table.row({ selected: true }).data();
         var rowsdata = table.rows().data();
         var tenantarray = [];
         for (var i = 0; i < rowsdata.length; i++) {
             tenantarray[i] = rowsdata[i];
         };
-        console.log(tenantarray);
+        console.log("tenant array");
+        console.log(tenantarray)
         console.log(String(tenantnamedata.tenant_name));
         $('#rent_update h5').html("Tenant: " + String(tenantnamedata.tenant_name));
 
@@ -279,7 +280,7 @@ $(document).ready(function() {
   $("#exp_formsave_exit").on('click', function() {
    
     jsBldgData['expense'] = makeTenantArray('#exp_update_list');
-    console.log("save exp btn");
+    console.log("save exp exit btn");
     console.log(JSON.stringify(jsBldgData));
     $.ajax({
       url: "/exp_update/data",
@@ -313,7 +314,7 @@ $(document).ready(function() {
   $("#cap_formsave_exit").on('click', function() {
    
     jsBldgData['improvements'] = makeTenantArray('#cap_update_list');
-    console.log("save cap btn");
+    console.log("save cap exit  btn");
     console.log(JSON.stringify(jsBldgData));
     $.ajax({
       url: "/cap_update/data",
@@ -327,5 +328,164 @@ $(document).ready(function() {
    
   })
   
+   $("#tenants_formsave").on('click', function() {
+   
+    jsBldgData['tenants'] = makeTenantArray('#tenants_udpate_list');
+    console.log("save tenants btn");
+    console.log(JSON.stringify(jsBldgData));
+    $.ajax({
+      url: "/tenants_update/data",
+      data: JSON.stringify(jsBldgData),
+      type: 'POST',
+      contentType: "application/json; charset=utf-8",
+      success: function() {
+        console.log("success");
+      }
+    });
+  })
+  
+   $("#tenants_formsave_exit").on('click', function() {
+   
+    jsBldgData['tenants'] = makeTenantArray('#tenants_udpate_list');
+    console.log("save tenants btn");
+    console.log(JSON.stringify(jsBldgData));
+    $.ajax({
+      url: "/tenants_update/data",
+      data: JSON.stringify(jsBldgData),
+      type: 'POST',
+      contentType: "application/json; charset=utf-8",
+      success: function() {
+        window.location.href = "/";
+      }
+    });
+   
+  })
+  
+  
+    // $("#rent_tnt_btn").on('click', function()  {
+    //     jsBldgData['tenants'] = makeTenantArray('#tenants_list');
+    //     console.log("tenant btn pressed");
+    //     var tenentsdata = {};
+    //     var table = $('#tenants_list').DataTable();
+    //     tenantnamedata = table.row({ selected: true }).data();
+    //     var rowsdata = table.rows().data();
+    //     var tenantarray = [];
+    //     for (var i = 0; i < rowsdata.length; i++) {
+    //         tenantarray[i] = rowsdata[i];
+    //     };
+    //     console.log(tenantarray);
+    //     console.log(String(tenantnamedata.tenant_name));
+    //     $('#rent_update h5').html("Tenant: " + String(tenantnamedata.tenant_name));
+
+     
+    //     $('#tenants_update').hide();
+    //     $('#rent_update').show();
+    //     $('#editform_bottom_btns').hide();
+
+        
+
+    //     // build rent table
+
+
+    //     var rentsEditor;
+    //     rentsEditor = new $.fn.dataTable.Editor({
+    //         "idSrc": "id",
+    //         "table": "#rent_list",
+    //         "fields": [{
+    //                 "label": "Start date",
+    //                 "name": "start_date",
+    //                 "type": 'datetime',
+    //                 "def": function() { return new Date(); }
+    //             },
+    //             {
+    //                 "label": "End date",
+    //                 "name": "end_date",
+    //                 "type": 'datetime',
+    //                 "def": function() { return new Date(); }
+    //             },
+    //             {
+    //                 "label": "monthly rent",
+    //                 "name": "monthly_rent"
+    //             }
+
+    //         ]
+    //     });
+
+    //     rentDataTable = $('#rent_list').DataTable({
+    //         // ajax: "/tenants_data",
+    //         data: tenantnamedata['rents'] ,
+    //         paging: false,
+    //         dom: 'Bfrtip',
+    //         columns: [
+    //             { "data": "start_date", "title": "Start Date" },
+    //             { "data": "end_date", "title": "End Date" },
+    //             { "data": "monthly_rent", "title": "Monthly Rent" },
+    //         ],
+    //         "destroy": true,
+    //         select: true,
+    //         buttons: [
+    //             { extend: "create", editor: rentsEditor },
+    //             { extend: "edit", editor: rentsEditor },
+    //             { extend: "remove", editor: rentsEditor }
+    //         ]
+    //     });
+    // });
+
+    // $('#rentexit').on('click', function() {
+    //   console.log("hit rent exit button");
+    //     $('#tenants_update').show();
+    //     $('#rent_update').hide();
+    //     $('#bldg_edit_tabs').show();
+    //     $('#editform_bottom_btns').show();
+    //     rentDataTable.clear().draw();
+
+
+    // });
+
+    // $('#rentsave').on('click', function() {
+    //     var rowsdata = rentDataTable.rows().data();
+    //     console.log(rowsdata);
+    //     var tenantName = tenantnamedata.tenant_name;
+    //     console.log("1. tenant is " + tenantName);
+    //     if (jsBldgData['tenants'] != []) {
+    //         console.log("there are tenants");
+    //         for (i = 0; i < jsBldgData['tenants'].length; i++) {
+    //             console.log(i);
+    //             if (jsBldgData['tenants'][i]['tenant_name'] === tenantnamedata.tenant_name) {
+    //                 console.log("2. tenant is " + tenantName);
+    //                 var rentrow = [];
+    //                 // Strip circular references
+    //                 for (j = 0; j < rowsdata.length; j++) {
+    //                     console.log("striping data");
+    //                     rentrow[j] = rowsdata[j]
+    //                 };
+    //                 console.log("rows data");
+    //                 console.log(JSON.stringify(rentrow));
+    //                 jsBldgData['tenants'][i]['rents'] = rentrow;
+    //             };
+    //         }
+    //         console.log("updated tenant");
+    //         console.log(JSON.stringify(jsBldgData));
+    //     }
+    //     else {
+    //         jsBldgData['tenants'][0]['tenant_name'] = tenantName;
+    //         // need a loop, clear out garbage/
+    //         var rentrow = [];
+    //         for (i = 0; i < rowsdata.length; i++) {
+    //             rentrow[i] = rowsdata[i];
+    //         };
+    //         jsBldgData['tenants'][0]['rents'] = rentrow;
+    //         console.log("new tenant");
+    //         console.log(JSON.stringify(jsBldgData));
+    //         rentDataTable.draw();
+    //     };
+    //     console.log("updating buttons...");
+    //     $('#tenants').show();
+    //     $('#rent').hide();
+    //     $('#bldg_edit_tabs').show();
+    //     $('#editform_bottom_btns').show();
+    //     rentDataTable.draw();
+    // });
+    
 
 });

@@ -21,8 +21,7 @@ $(document).ready(function() {
         { "data": "name", "title": "Name" }
       ],
       select: true,
-      
-
+     buttons: [],
     });
 
     $('#bldg_list').on( 'click',    function() {

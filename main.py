@@ -133,7 +133,7 @@ def exp_data_edit():
 @app.route('/tenants_data_edit' )
 def tenants_data_edit(): 
     tenantsdata = session['editdata']
-    print('recieved tenantsdata...')
+    print('recieved tenants data... tenants_data_edit')
     print(tenantsdata)
     if session['editdata'] == "":
         return redirect(url_for("propertyhome"))
@@ -187,14 +187,19 @@ def bldg_edit():
     print(data)
     if data == "":
         return redirect(url_for("propertyhome"))
-    dbData = mongo.db.building.find_one({"_id": ObjectId(data)})
-    bldgEdit = dbData
-    print('returns mongo record')
-    print(bldgEdit)
-    if 'submit_save' in request.form:  #test code
-        print("found submit save button")
-    return render_template("/bldg_update.html", data= bldgEdit)
-
+    if 'submit_save' in request.form:
+        dbData = mongo.db.building.find_one({"_id": ObjectId(data)})
+        bldgEdit = dbData
+        print('returns mongo record')
+        print(bldgEdit)
+        return render_template("/bldg_update.html", data= bldgEdit)
+    elif 'submit_delete' in request.form:
+        print("hit submit delete btn")
+        dbData = mongo.db.building.remove({"_id": ObjectId(data)})
+        return redirect(url_for("propertyhome"))
+    else:
+        print("request button not found")
+        return
 
 @app.route('/next_update', methods = ["GET", "POST"] )
 def next_update():
@@ -397,8 +402,40 @@ def cap_update_result():
 
 @app.route('/tenants_update_tab', methods=['POST', 'GET'])
 def tenants_update_tab():
-    return
+    print('data received for tenants tab page ...')
+    bldg_id = session['bldg_id']
+    print(bldg_id)
+    dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
+    bldgEdit = dbData
+    print("return mongo data")
+    if "tenants" in bldgEdit:
+        session['editdata'] = bldgEdit['tenants']
+    else:
+        session['editdata'] = []
+    print(bldgEdit)
+    return render_template("/tenants_update.html", data = bldgEdit)
 
+@app.route("/tenants_update/data" , methods=['POST', 'GET'])    
+def tenants_update_result():
+    bldg_id = session['bldg_id']
+    data = request.get_json()
+    print("ajax tenants data recieved.../tenants_update/data ")
+    print(dumps(data))
+    building = mongo.db.building
+    building.update({'_id': ObjectId(bldg_id)},
+        {"$set": {
+        "tenants": data["tenants"],
+        }})
+    print("data inserted...")
+    dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
+    bldgEdit = dbData
+    print("return mongo data")
+    if "improvements" in bldgEdit:
+        session['editdata'] = bldgEdit['tenants']
+    else:
+        session['editdata'] = []
+    print(bldgEdit)
+    return render_template("/tenants_update.html", data = bldgEdit)
 
 if __name__ == '__main__':
     app.run(host=os.environ.get('IP'),
