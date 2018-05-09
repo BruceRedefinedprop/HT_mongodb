@@ -121,7 +121,7 @@ def cap_data_edit():
 @app.route('/exp_data_edit' )
 def exp_data_edit(): 
     expdata = session['editdata']
-    print('recieved expdata...')
+    print('recieved expdata...exp_data_edit')
     print(expdata)
     if session['editdata'] == "":
         return redirect(url_for("propertyhome"))
@@ -183,6 +183,7 @@ def expense_data():
 def bldg_edit():
     print('data received from list page ...')
     data = request.form['bldg_id']
+    session['bldg_id'] = data
     print(data)
     if data == "":
         return redirect(url_for("propertyhome"))
@@ -208,7 +209,10 @@ def next_update():
     print(bldgEdit)
     if 'info_formsave' in request.form:  #test code
         print("found acqusition submit save button")
-        return render_template("/acq_update.html", data= bldgEdit)
+        print(request.form['name'])
+        
+        
+        return render_template("/acq_update.html", data=bldgEdit)
     elif 'acq_formsave' in request.form:
         print("found capital submit save button")
         if "improvements" in bldgEdit:
@@ -234,13 +238,166 @@ def next_update():
         print("wrong sumbit button")
         return render_template("/bldg_list.html")
     return    
-        
 
+# @app.route('/info_update/<id>')        
+@app.route('/info_update', methods = ["POST"])
+def info_update():
+    
+    print('data received for info page ...')
+    bldg_id = request.form['bldg_id']
+    session['bldg_id'] = bldg_id
+    print(bldg_id)
+    print(request.form['bldg_name'])
+    
+    mongo.db.building.update({'_id': ObjectId(bldg_id)}, {"$set": 
+        {
+        "name": request.form['bldg_name'],
+        "street": request.form['bldg_street'],
+        "town": request.form['bldg_town'],
+        "st": request.form['bldg_st'],
+        "zip": request.form['bldg_zip'],
+        "page": request.form['bldg_page'],
+        "lot": request.form['bldg_lot'],
+        "block": request.form['bldg_block'],
+        "gla": request.form['bldg_gla'],
+        "land": request.form['bldg_land'],
+        # "type": request.form['bldg_type']
+        }})
+    dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
+    bldgEdit = dbData
+    print("return mongo data")
+    print(bldgEdit)
+    if 'info_formsave' in request.form: 
+        return render_template("/bldg_update.html", data = bldgEdit)
+    else: 
+        return render_template("bldg_list.html")
 
+@app.route('/info_update_tab')
+def info_update_tab():
+    print('data received for info tab page ...')
+    bldg_id = session['bldg_id']
+    print(bldg_id)
+   
+    dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
+    bldgEdit = dbData
+    print("return mongo data")
+    print(bldgEdit)
+    return render_template("/bldg_update.html", data = bldgEdit)
 
+@app.route('/acq_update', methods = ["POST"])
+def acq_update():
+    print('data received for acq page ...')
+    bldg_id = request.form['bldg_id']
+    session['bldg_id'] = bldg_id
+    print(bldg_id)
+    mongo.db.building.update({'_id': ObjectId(bldg_id)},
+        {"$set": {
+        "contract_price": request.form['bldg_price'],
+        "noi": request.form['bldg_noi'],
+        "cap": request.form['bldg_cap'],
+        "bank": request.form['bldg_bank'],
+        "loan_amount": request.form['bldg_loan_amt'],
+        "ltv": request.form['bldg_ltv'],
+        "loan_term": request.form['bldg_loan_term'],
+        "amort": request.form['bldg_loan_amort']
+        }})
+    dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
+    bldgEdit = dbData
+    print("return mongo data")
+    print(bldgEdit)
+    if 'acq_formsave' in request.form: 
+        return render_template("/acq_update.html", data = bldgEdit)
+    else: 
+        return render_template("bldg_list.html")
 
-
+@app.route('/acq_update_tab')
+def acq_update_tab():
+    print('data received for acq tab page ...')
+    bldg_id = session['bldg_id']
+    print(bldg_id)
+    dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
+    bldgEdit = dbData
+    print("return mongo data")
+    print(bldgEdit)
+    return render_template("/acq_update.html", data = bldgEdit)
       
+@app.route('/exp_update_tab', methods=['POST', 'GET'])
+def exp_update_tab():
+    print('data received for exp tab page ...')
+    bldg_id = session['bldg_id']
+    print(bldg_id)
+    dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
+    bldgEdit = dbData
+    print("return mongo data")
+    if "expense" in bldgEdit:
+        session['editdata'] = bldgEdit['expense']
+    else:
+        session['editdata'] = []
+    print(bldgEdit)
+    return render_template("/exp_update.html", data = bldgEdit)
+
+@app.route("/exp_update/data" , methods=['POST', 'GET'])    
+def exp_update_result():
+    bldg_id = session['bldg_id']
+    data = request.get_json()
+    print("ajax data recieved...")
+    print(dumps(data))
+    building = mongo.db.building
+    building.update({'_id': ObjectId(bldg_id)},
+        {"$set": {
+        "expense": data['expense'],
+        }})
+    print("data inserted...")
+    dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
+    bldgEdit = dbData
+    print("return mongo data")
+    if "expense" in bldgEdit:
+        session['editdata'] = bldgEdit['expense']
+    else:
+        session['editdata'] = []
+    print(bldgEdit)
+    return render_template("/exp_update.html", data = bldgEdit)
+
+@app.route('/cap_update_tab', methods=['POST', 'GET'])
+def cap_update_tab():
+    print('data received for cap tab page ...')
+    bldg_id = session['bldg_id']
+    print(bldg_id)
+    dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
+    bldgEdit = dbData
+    print("return mongo data")
+    if "improvements" in bldgEdit:
+        session['editdata'] = bldgEdit['improvements']
+    else:
+        session['editdata'] = []
+    print(bldgEdit)
+    return render_template("/cap_update.html", data = bldgEdit)
+
+@app.route("/cap_update/data" , methods=['POST', 'GET'])    
+def cap_update_result():
+    bldg_id = session['bldg_id']
+    data = request.get_json()
+    print("ajax cap data recieved...")
+    print(dumps(data))
+    building = mongo.db.building
+    building.update({'_id': ObjectId(bldg_id)},
+        {"$set": {
+        "improvements": data["improvements"],
+        }})
+    print("data inserted...")
+    dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
+    bldgEdit = dbData
+    print("return mongo data")
+    if "improvements" in bldgEdit:
+        session['editdata'] = bldgEdit['improvements']
+    else:
+        session['editdata'] = []
+    print(bldgEdit)
+    return render_template("/cap_update.html", data = bldgEdit)
+
+@app.route('/tenants_update_tab', methods=['POST', 'GET'])
+def tenants_update_tab():
+    return
 
 
 if __name__ == '__main__':
