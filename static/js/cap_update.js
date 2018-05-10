@@ -1,6 +1,15 @@
+// cap_update.js controls edit pages and builds DataTables
+
+// GLOBALS
+
+//  jsBldgData object is local store before object is sent to MongoDB
 var jsBldgData = {};
+
+// names of DataTable instances
 var rentDataTable;
 var tenantnamedata;
+var capDataTable;
+
 
 function makeTenantArray(targetID) {
   // build template object
@@ -15,10 +24,11 @@ function makeTenantArray(targetID) {
 };
 
 $(document).ready(function() {
-
+// When tenants_update.html, tenants update page, is loaded, rent table is hidden
     $('#tenants_update').show();
     $('#rent_update').hide();
 
+//  builds capital DataTable on cap_update.html
     var capEditor;
     capEditor = new $.fn.dataTable.Editor({
         "idSrc": "id",
@@ -40,7 +50,8 @@ $(document).ready(function() {
         ]
     });
 
-    $('#cap_update_list').DataTable({
+
+    capDataTable = $('#cap_update_list').DataTable({
         ajax: "/cap_data_edit",
         // paging: false,
         dom: 'Bfrtip',
@@ -57,6 +68,7 @@ $(document).ready(function() {
         ]
     });
 
+// builds Expenses DataTable for Expense page exp_update.html
     var expEditor;
     expEditor = new $.fn.dataTable.Editor({
         "idSrc": "id",
@@ -98,6 +110,7 @@ $(document).ready(function() {
         ]
     });
 
+// builds tenants and rent DataTables for tenants_update.html
     var tenantsEditor;
     tenantsEditor = new $.fn.dataTable.Editor({
         "idSrc": "id",
@@ -132,24 +145,32 @@ $(document).ready(function() {
     });
     
 
-
+// edit rent button clicked on Tenants page
     $("#rent_tnt_btn").on('click', function()  {
+        // stores current rent table
         jsBldgData['tenants'] = makeTenantArray('#tenants_udpate_list');
         console.log("tenant btn pressed");
+        // get tenant data from selected row in table
         var tenentsdata = {};
         var table = $('#tenants_udpate_list').DataTable();
         tenantnamedata = table.row({ selected: true }).data();
+        // gets all tenant data so table can be recreated
         var rowsdata = table.rows().data();
         var tenantarray = [];
+        // cleans up DataTable data
         for (var i = 0; i < rowsdata.length; i++) {
             tenantarray[i] = rowsdata[i];
         };
+        
+        // test code
         console.log("tenant array");
         console.log(tenantarray)
         console.log(String(tenantnamedata.tenant_name));
+        
+        // adds tenant name to top of 
         $('#rent_update h5').html("Tenant: " + String(tenantnamedata.tenant_name));
 
-     
+    //  hides tenants info on html page and shows rent table
         $('#tenants_update').hide();
         $('#rent_update').show();
         $('#editform_bottom_btns').hide();
@@ -203,6 +224,9 @@ $(document).ready(function() {
         });
     });
 
+
+// when rent exit button press, hides rent table and clears rent DataTable
+// does not save DataTable data
     $('#rentexit').on('click', function() {
        console.log("hit rent exit button");
         $('#tenants_update').show();
@@ -210,19 +234,22 @@ $(document).ready(function() {
         $('#bldg_edit_tabs').show();
         $('#editform_bottom_btns').show();
         rentDataTable.clear().draw();
-
-
     });
 
+// On tenants page, save rent button clicked
     $('#rentsave').on('click', function() {
+        //  save all rent data
         var rowsdata = rentDataTable.rows().data();
         console.log(rowsdata);
+        // gets tenant name so that data can be stored in array
         var tenantName = tenantnamedata.tenant_name;
         console.log("1. tenant is " + tenantName);
         if (jsBldgData['tenants'] != []) {
             console.log("there are tenants");
+            // stores rent array data into designated tenants's array
             for (i = 0; i < jsBldgData['tenants'].length; i++) {
                 console.log(i);
+                // looks for matching tenant name as search key
                 if (jsBldgData['tenants'][i]['tenant_name'] === tenantnamedata.tenant_name) {
                     console.log("2. tenant is " + tenantName);
                     var rentrow = [];
@@ -233,6 +260,7 @@ $(document).ready(function() {
                     };
                     console.log("rows data");
                     console.log(JSON.stringify(rentrow));
+                    // stores rent data in selected tenant
                     jsBldgData['tenants'][i]['rents'] = rentrow;
                 };
             }
@@ -251,16 +279,19 @@ $(document).ready(function() {
             console.log(JSON.stringify(jsBldgData));
             rentDataTable.draw();
         };
+        
+        //  restores tenant table, hides rent table
         console.log("updating buttons...");
-        $('#tenants').show();
-        $('#rent').hide();
-        $('#bldg_edit_tabs').show();
-        $('#editform_bottom_btns').show();
+        $('#tenants_update').hide();
+        $('#rent_update').show();
+        $('#editform_bottom_btns').hide()
         rentDataTable.draw();
     });
     
     
-
+// for expenses update page exp_update.html when save button is clicked
+// saves expense data to Mongodb building collection.
+// uses AJAX to send data.
   $("#exp_formsave").on('click', function() {
    
     jsBldgData['expense'] = makeTenantArray('#exp_update_list');
@@ -277,6 +308,9 @@ $(document).ready(function() {
     });
   })
 
+
+// for expenses page when save exit button is clicked,
+// saves data and returns home page
   $("#exp_formsave_exit").on('click', function() {
    
     jsBldgData['expense'] = makeTenantArray('#exp_update_list');
@@ -294,7 +328,7 @@ $(document).ready(function() {
    
   })
   
-
+// Capital Update page cap_update.html save button click, saves capital data.
   $("#cap_formsave").on('click', function() {
    
     jsBldgData['improvements'] = makeTenantArray('#cap_update_list');
@@ -309,8 +343,13 @@ $(document).ready(function() {
         console.log("success");
       }
     });
+    
+    window.location.reload(true);
+    window.location.href = "/cap_update_tab";
   })
 
+// capital update page cap_update.html save and exit button click saves
+// capital data and exits to homes page.
   $("#cap_formsave_exit").on('click', function() {
    
     jsBldgData['improvements'] = makeTenantArray('#cap_update_list');
@@ -328,6 +367,7 @@ $(document).ready(function() {
    
   })
   
+//   tenants page tenants_update.html save button clicked.
    $("#tenants_formsave").on('click', function() {
    
     jsBldgData['tenants'] = makeTenantArray('#tenants_udpate_list');
@@ -344,6 +384,7 @@ $(document).ready(function() {
     });
   })
   
+//   tenants page tenants_update.html save and exit button clicked
    $("#tenants_formsave_exit").on('click', function() {
    
     jsBldgData['tenants'] = makeTenantArray('#tenants_udpate_list');
@@ -361,131 +402,6 @@ $(document).ready(function() {
    
   })
   
-  
-    // $("#rent_tnt_btn").on('click', function()  {
-    //     jsBldgData['tenants'] = makeTenantArray('#tenants_list');
-    //     console.log("tenant btn pressed");
-    //     var tenentsdata = {};
-    //     var table = $('#tenants_list').DataTable();
-    //     tenantnamedata = table.row({ selected: true }).data();
-    //     var rowsdata = table.rows().data();
-    //     var tenantarray = [];
-    //     for (var i = 0; i < rowsdata.length; i++) {
-    //         tenantarray[i] = rowsdata[i];
-    //     };
-    //     console.log(tenantarray);
-    //     console.log(String(tenantnamedata.tenant_name));
-    //     $('#rent_update h5').html("Tenant: " + String(tenantnamedata.tenant_name));
-
-     
-    //     $('#tenants_update').hide();
-    //     $('#rent_update').show();
-    //     $('#editform_bottom_btns').hide();
-
-        
-
-    //     // build rent table
-
-
-    //     var rentsEditor;
-    //     rentsEditor = new $.fn.dataTable.Editor({
-    //         "idSrc": "id",
-    //         "table": "#rent_list",
-    //         "fields": [{
-    //                 "label": "Start date",
-    //                 "name": "start_date",
-    //                 "type": 'datetime',
-    //                 "def": function() { return new Date(); }
-    //             },
-    //             {
-    //                 "label": "End date",
-    //                 "name": "end_date",
-    //                 "type": 'datetime',
-    //                 "def": function() { return new Date(); }
-    //             },
-    //             {
-    //                 "label": "monthly rent",
-    //                 "name": "monthly_rent"
-    //             }
-
-    //         ]
-    //     });
-
-    //     rentDataTable = $('#rent_list').DataTable({
-    //         // ajax: "/tenants_data",
-    //         data: tenantnamedata['rents'] ,
-    //         paging: false,
-    //         dom: 'Bfrtip',
-    //         columns: [
-    //             { "data": "start_date", "title": "Start Date" },
-    //             { "data": "end_date", "title": "End Date" },
-    //             { "data": "monthly_rent", "title": "Monthly Rent" },
-    //         ],
-    //         "destroy": true,
-    //         select: true,
-    //         buttons: [
-    //             { extend: "create", editor: rentsEditor },
-    //             { extend: "edit", editor: rentsEditor },
-    //             { extend: "remove", editor: rentsEditor }
-    //         ]
-    //     });
-    // });
-
-    // $('#rentexit').on('click', function() {
-    //   console.log("hit rent exit button");
-    //     $('#tenants_update').show();
-    //     $('#rent_update').hide();
-    //     $('#bldg_edit_tabs').show();
-    //     $('#editform_bottom_btns').show();
-    //     rentDataTable.clear().draw();
-
-
-    // });
-
-    // $('#rentsave').on('click', function() {
-    //     var rowsdata = rentDataTable.rows().data();
-    //     console.log(rowsdata);
-    //     var tenantName = tenantnamedata.tenant_name;
-    //     console.log("1. tenant is " + tenantName);
-    //     if (jsBldgData['tenants'] != []) {
-    //         console.log("there are tenants");
-    //         for (i = 0; i < jsBldgData['tenants'].length; i++) {
-    //             console.log(i);
-    //             if (jsBldgData['tenants'][i]['tenant_name'] === tenantnamedata.tenant_name) {
-    //                 console.log("2. tenant is " + tenantName);
-    //                 var rentrow = [];
-    //                 // Strip circular references
-    //                 for (j = 0; j < rowsdata.length; j++) {
-    //                     console.log("striping data");
-    //                     rentrow[j] = rowsdata[j]
-    //                 };
-    //                 console.log("rows data");
-    //                 console.log(JSON.stringify(rentrow));
-    //                 jsBldgData['tenants'][i]['rents'] = rentrow;
-    //             };
-    //         }
-    //         console.log("updated tenant");
-    //         console.log(JSON.stringify(jsBldgData));
-    //     }
-    //     else {
-    //         jsBldgData['tenants'][0]['tenant_name'] = tenantName;
-    //         // need a loop, clear out garbage/
-    //         var rentrow = [];
-    //         for (i = 0; i < rowsdata.length; i++) {
-    //             rentrow[i] = rowsdata[i];
-    //         };
-    //         jsBldgData['tenants'][0]['rents'] = rentrow;
-    //         console.log("new tenant");
-    //         console.log(JSON.stringify(jsBldgData));
-    //         rentDataTable.draw();
-    //     };
-    //     console.log("updating buttons...");
-    //     $('#tenants').show();
-    //     $('#rent').hide();
-    //     $('#bldg_edit_tabs').show();
-    //     $('#editform_bottom_btns').show();
-    //     rentDataTable.draw();
-    // });
-    
+   
 
 });

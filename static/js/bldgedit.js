@@ -1,37 +1,32 @@
-var editor;
+// blddgedit.js is used with bldg_edit_form.html to create a new doucment.
+// builds datatables, formats dato for MongodB, uses ajax save data.
+
+
+// GLOBALVARIABLES
+// used to create editable DataTable
+var editor;  
 var rentDataTable;
 var tenantnamedata;
-var jsBldgData = {};
+// jsBldgData is used to build a MongDb building document.
+var jsBldgData = {};  
 
-// jsBldgData['tenants'] = [];
-// jsBldgData['tenants'][0] = { 'tenant_name' : 'Stan' , 'leased_space' : '', 'rents' : [] };
-// jsBldgData['tenants'][0] = { 'tenant_name' : 'Auto' , 'leased_space' : '', 'rents' : [] };
-// jsBldgData['tenants'][0] = {};
-// jsBldgData['tenants'][0]['rents'] = [];
 
-// function makeTenantArray() {
-//     // build template object
-//     // get Table rows
-//     var table = $('#tenants_list').DataTable();
-//     var rowsdata = table.rows().data();
-//     // DataTable is a list that has lots of extra stuff appended to list, that confuses to JSON.
-//     // target object starts index 0, remove extra stuff list.
-//     var array = [];
-//     for (var i = 0; i < rowsdata.length; i++) {array[i] = rowsdata[i];};
-//     return array; 
-//   };
+
+// Function to retrieves and reformat DataTable output to compatible 
+// MongoDb.  Each DataTable record includes extra dictionary elements
+// above and beyond data we need to collect.   Extra elements causes JSON to fail.
+ 
 function makeTenantArray(targetID) {
   // build template object
   // get Table rows
   var table = $(targetID).DataTable();
   var rowsdata = table.rows().data();
-  // DataTable is a list that has lots of extra stuff appended to list, that confuses to JSON.
-  // target object starts index 0, remove extra stuff list.
   var array = [];
   for (var i = 0; i < rowsdata.length; i++) { array[i] = rowsdata[i]; };
   return array;
 };
 
+// used by the save_data(). Collects data from info page.
 function info_data() {
   jsBldgData['name'] = $('#bldg_name').val();
   jsBldgData['street'] = $('#bldg_street').val();
@@ -47,6 +42,8 @@ function info_data() {
   jsBldgData['land'] = $('#bldg_land').val();
 };
 
+// used by the save_data(). Collects data from acquisition page.
+
 function acquisition_data() {
   jsBldgData['contract_price'] = $('#bldg_price').val();
   jsBldgData['noi'] = $('#bldg_noi').val();
@@ -58,11 +55,15 @@ function acquisition_data() {
   jsBldgData['amort'] = $('#bank_loan_amort').val();
 };
 
+// saves all the data to jsBlddgData object. 
+// jsBldgData is sent to main.py via AJAX to add to the building Collection.
+// makeTenantArray retrieves data from the designated Datatable and reformats it
+// for MongoDb.
 function save_data() {
   jsBldgData['tenants'] = makeTenantArray('#tenants_list');
   jsBldgData['expense'] = makeTenantArray('#expense_list');
   jsBldgData['improvements'] = makeTenantArray('#cap_list');
-  info_data(); // load building info to jsBldgData
+  info_data();  
   acquisition_data();
   console.log("make array");
   console.log(JSON.stringify(jsBldgData));
@@ -71,10 +72,11 @@ function save_data() {
 
 $(document).ready(function() {
 
+// puts bldgData record into hidden html input tag.
   var bldgData = $('#editbldgdata').val();
   console.log("building data loaded")
   console.log(bldgData)
-
+// display info tab info only.
   $('#infoTab').on('click', function() {
     $('#info').css('display', 'block');
     $('#purchase').css('display', 'none');
@@ -83,7 +85,7 @@ $(document).ready(function() {
     $('#expenses').css('display', 'none');
     $('#capital').css('display', 'none');
   })
-
+// display acqusition tab data only
   $('#purchaseTab').on('click', function() {
     $('#info').hide();
     $('#purchase').show();
@@ -93,7 +95,7 @@ $(document).ready(function() {
     $('#expenses').css('display', 'none');
     $('#capital').css('display', 'none');
   })
-
+// displays tenants tab only.  Also, hidding rent data.
   $('#tenantsTab').on('click', function() {
     $('#info').hide();
     $('#purchase').hide();
@@ -103,7 +105,7 @@ $(document).ready(function() {
     $('#expenses').css('display', 'none');
     $('#capital').css('display', 'none');
   })
-
+// displays expense tab data only.
   $('#expenseTab').on('click', function() {
     $('#info').hide();
     $('#purchase').hide();
@@ -113,7 +115,7 @@ $(document).ready(function() {
     $('#expenses').show();
     $('#capital').css('display', 'none');
   })
-
+// display capital tab data only.
   $('#capitalTab').on('click', function() {
     $('#info').hide();
     $('#purchase').hide();
@@ -124,7 +126,9 @@ $(document).ready(function() {
     $('#capital').show();
   })
 
-
+// builds capital DataTables and Editor
+// data is retrieved from main.py via AJAX
+// See DataTable documentation for configuration data.
   var capEditor;
   capEditor = new $.fn.dataTable.Editor({
     "idSrc": "id",
@@ -163,7 +167,7 @@ $(document).ready(function() {
     ]
   });
 
-
+// builds tenants DataTable
   var tenantsEditor;
   tenantsEditor = new $.fn.dataTable.Editor({
     "idSrc": "id",
@@ -198,7 +202,7 @@ $(document).ready(function() {
   });
 
 
-
+// builds expense DataTable
   var expenseEditor;
   expenseEditor = new $.fn.dataTable.Editor({
     "idSrc": "id",
@@ -215,8 +219,6 @@ $(document).ready(function() {
         "label": "Annual Growth",
         "name": "exp_growth"
       }
-
-
 
     ]
   });
@@ -239,18 +241,25 @@ $(document).ready(function() {
     ]
   });
 
+// when edit rent button pressed on the the tenants tab.
+// tenant form is hiddened and rent Datatable is built.
+// user has the option to save rent data or return to tenants table.
+
   $('#rent_tnt_btn').on('click', function() {
+    // retrieve selected tenant data
     var tenentsdata = {};
     var table = $('#tenants_list').DataTable();
     tenantnamedata = table.row({ selected: true }).data();
+    // store whole tenant table data so it can be rebuilt.
     var rowsdata = table.rows().data();
+    // remove extra DataTable info, keep needed data
     var tenantarray = [];
     for (var i = 0; i < rowsdata.length; i++) {
       tenantarray[i] = rowsdata[i];
     };
     console.log(tenantarray);
     console.log(String(tenantnamedata.tenant_name));
-
+// reformat web page to show only rent table
     $('#info').hide();
     $('#purchase').hide();
     $('#tenants').hide();
@@ -261,11 +270,10 @@ $(document).ready(function() {
     $('#editform_bottom_btns').hide()
 
 
-
+// displays selected tenant's name on rent tab.
     $('#rent h5').html("Tenant: " + String(tenantnamedata.tenant_name))
 
     // build rent table
-
 
     var rentsEditor;
     rentsEditor = new $.fn.dataTable.Editor({
@@ -290,11 +298,11 @@ $(document).ready(function() {
 
       ]
     });
-
+// creates blank rent table.
     rentDataTable = $('#rent_list').DataTable({
-      // ajax: "/tenants_data",
+      // ajax:,
       // paging: false,
-      // data: jsBldgData['tenants'][0]['rents'] ,
+      // data:  ,
       dom: 'Bfrtip',
       columns: [
         { "data": "start_date", "title": "Start Date" },
@@ -311,6 +319,8 @@ $(document).ready(function() {
     });
   });
 
+// When Rent Exit button is pressed, rent table is cleared and hidden
+// tenant tab is presented.
   $('#rentexit').on('click', function() {
     $('#info').hide();
     $('#purchase').hide();
@@ -321,19 +331,25 @@ $(document).ready(function() {
     $('#bldg_edit_tabs').show();
     $('#editform_bottom_btns').show();
     rentDataTable.clear().draw()
-
-
   });
 
+// When Rent Save button is pressed, Rent data is saved to
+// JsBldgData's tenants list. the tenant list keeps rents objects.
+// 
   $('#rentsave').on('click', function() {
+    // saves the contents of rent DataTable.
     var rowsdata = rentDataTable.rows().data();
+    // test code to verify that rent data for specific tenant collected.
     console.log(rowsdata);
     var tenantName = tenantnamedata.tenant_name;
     console.log("1. tenant is " + tenantName);
+    
     if (jsBldgData['tenants'] != []) {
+      // Stores rent data into previously selected tenant
       console.log("there are tenants");
       for (i = 0; i < jsBldgData['tenants'].length; i++) {
         console.log(i);
+        // searches for matching tenant and stores new rent into array
         if (jsBldgData['tenants'][i]['tenant_name'] === tenantnamedata.tenant_name) {
           console.log("2. tenant is " + tenantName);
           var rentrow = [];
@@ -344,15 +360,16 @@ $(document).ready(function() {
           };
           console.log("rows data");
           console.log(JSON.stringify(rentrow));
+          // stores rent into selected table
           jsBldgData['tenants'][i]['rents'] = rentrow;
         };
       }
+      // test code
       console.log("updated tenant");
       console.log(JSON.stringify(jsBldgData))
     }
     else {
-      // jsBldgData['tenants'] = [];
-      // jsBldgData['tenants'][0] = {};
+      // inserts blank rent into first tenants tenant position
       jsBldgData['tenants'][0]['tenant_name'] = tenantName;
       // jsBldgData['tenants'][0]['rents'] = [];
       // need a loop, clear out garbage/
@@ -365,7 +382,7 @@ $(document).ready(function() {
       console.log(JSON.stringify(jsBldgData));
       rentDataTable.draw();
     };
-
+    // restores tenant page, draws empty rent table for future use.
     $('#info').hide();
     $('#purchase').hide();
     $('#tenants').show();
@@ -377,10 +394,11 @@ $(document).ready(function() {
     rentDataTable.clear().draw()
   });
 
-
+// Save button controls.  Saves data to jsBldgData object
   $("#newbldgSaveBtn").on('click', function() {
     save_data();
-
+    
+// Old test code
     // jsBldgData['tenants']  = makeTenantArray('#tenants_list');
     // jsBldgData['expense']  = makeTenantArray('#expense_list');
     // jsBldgData['improvements']  = makeTenantArray('#cap_list');
@@ -390,7 +408,8 @@ $(document).ready(function() {
     // console.log(JSON.stringify(jsBldgData));
 
   });
-
+// Saves Data and uses AJAX to main.py.
+// main.py stores inserts new record into MongoDb's building collection.
   $("#newbldgSaveExitBtn").on('click', function() {
     save_data();
     console.log("exit btn");

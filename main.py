@@ -1,3 +1,13 @@
+"""
+main.py is the main program loop. 
+
+It holds python flask view functions and mongoDb CRUD logic
+
+"""
+
+
+
+
 import os
 import json
 from flask import Flask, render_template, redirect, request, url_for, jsonify, session
@@ -6,7 +16,7 @@ from bson.objectid import ObjectId
 from bson.json_util import dumps, loads
 from helper import TableBuilder
 
-
+# sets up flask and Mongodb connection
 app = Flask(__name__)
 app.config["MONGO_DBNAME"] = 'ht_property'
 app.config["MONGO_URI"] = 'mongodb://bruce:quailrun@ds251799.mlab.com:51799/ht_property'
@@ -15,7 +25,15 @@ app.config['SECRET_KEY'] = 'well-secret-password'
 mongo = PyMongo(app)
 
 
-# if building db is empty, display a name input, else build a table of names
+# helper function used to clean up datatable results before submitted to MongoDb
+def getTableData(data):
+    temp = list(data)
+    for x in range(len(temp)): #DataTables Editor requires id 
+        temp[x]['id'] = x
+    table = {'data': temp}
+    print(table)
+    return table
+ 
 """
 Home route.  grabs all records in building collection.  
 If collection is empty, redirect to creating a new record.
@@ -23,24 +41,27 @@ bldg_list_html creates of building to choose from.
 
 """
 
-
-
 @app.route('/')
 def propertyhome():
+    # clears session variables
     session["record_status"] = "home"
     session['newdata'] = ""
     session['bldgEditID'] = ""
     session['editdata'] = ""
     print("index page")
+    # retrieves all building records.  Database is small.
+    # for a larger databases, I would create a filtered find that just gets ids, names and cities
     bldg = mongo.db.building.find()
     print(bldg.count())
     # print(dumps(bldg))
+    #  database is empty go to Add a record page
     if bldg.count() == 0:
         print("no data in db")
         return redirect(url_for("bldg_new"))
+    # show building list 
     return render_template("bldg_list.html")
     
-    
+# used by bldg_list.js to retrieve building list via AJAX 
 @app.route('/bldg_list_data')
 def bldg_list_data():
     session['status'] = "idle"
@@ -60,9 +81,10 @@ def bldg_list_data():
 # the JS file.
 
 
+# /bldg_new is reached when user on home page, building list press the Add button.
+# Add button creates new blank record.
 #/bldg_new retrieves a blank template record helper.py
-#that template is sent to bldg_edit_form.html.
-# not sure it's necessary.
+#that template is sent to bldg_edit_form.html.  
 
 @app.route('/bldg_new' , methods=['POST', 'GET'])
 def bldg_new():
@@ -89,27 +111,33 @@ def bldg_new_result():
 # In the bldg_edit_form, to populate the various datatable, we need to pull data
 # from the various data records.   The session{'data'] variable is set in bldg_new() view function
 # when the data record is created.  The view functions below used below to pass via
-# ajax, data back to clientside to populate the tables.  Due to particulars of DataTable
+# ajax, data back to client side to populate the tables.  Due to particulars of DataTable
 # data needs to be reformated with id required by DataTables' Editor and put into proper 
 # dictionary format.
+
+
+# used by add a new document, bldgedit.js to send JSON data to bldg_edit_form.html.
+# session['newdata'] is used as a temporary store a  blank document template dictionary.
+# the template document is created because a future feature will be to load default values
+# into the tempalte dictionary.  The default values will come from settings and helper.py.
 
 @app.route('/cap_data')
 def cap_data():  
     data = session['newdata']
     capdata = data['improvements']
     temp = list(capdata)
-    # for x in range(len(temp)):
-    #     temp[x]['id'] = x
-    # table = {'data': temp}
-    # print(table)
     table = getTableData(temp)
     return dumps(table)
 
+# similar function as above.  Used by the edit a document feature to send JSON 
+# data to populate the capital table on cap_update.html.    session['editdata']
+# is used pass document being editted between view functions. 
 @app.route('/cap_data_edit' )
 def cap_data_edit(): 
     capdata = session['editdata']
     print('recieved capdata...')
     print(capdata)
+    # no data to edit, go to home page.
     if session['editdata'] == "":
         return redirect(url_for("propertyhome"))
     temp = list(capdata)
@@ -118,6 +146,8 @@ def cap_data_edit():
     print(table)
     return dumps(table)
 
+# Used by the edit a document to send JSON used to populate expense table.
+# targe exp_update.html
 @app.route('/exp_data_edit' )
 def exp_data_edit(): 
     expdata = session['editdata']
@@ -130,6 +160,7 @@ def exp_data_edit():
     print(table)
     return dumps(table)
 
+# used by edit function to send JSON to populate capital table.
 @app.route('/tenants_data_edit' )
 def tenants_data_edit(): 
     tenantsdata = session['editdata']
@@ -143,7 +174,7 @@ def tenants_data_edit():
     return dumps(table)
 
 
-
+# Used by Add a document and bldgedit.js to send JSON used to populate tenants table 
 @app.route('/tenants_data')
 def tenants_data():  
     data = session['newdata']
@@ -156,14 +187,8 @@ def tenants_data():
     # print(table)
     return dumps(table)
     
-def getTableData(data):
-    temp = list(data)
-    for x in range(len(temp)): #DataTables Editor requires id 
-        temp[x]['id'] = x
-    table = {'data': temp}
-    print(table)
-    return table
 
+# Used by Add a document to send JSON to populate expense table.
 @app.route('/expense_data')
 def expense_data():  
     data = session['newdata']
@@ -176,23 +201,28 @@ def expense_data():
     table = getTableData(temp)
     return dumps(table)
     
-# Retrieve and Edit database info.  The first page will look at the info page.
-# grads the bldg_id, database key, from the building list page.  If no, id
-# user is redirected back to building request page.
+# bldg_edit() controls the buttons building list page bldg_list.html.
+# 
 @app.route('/bldg_edit', methods = ["GET", "POST"] )
 def bldg_edit():
     print('data received from list page ...')
+    # retrieves mongodb id for the selected record
+    # session variable is used by other view functions to edit record
     data = request.form['bldg_id']
     session['bldg_id'] = data
     print(data)
+    # no data retrieved to back to home page.
     if data == "":
         return redirect(url_for("propertyhome"))
+    # IF the edit button on building list page is clicked
+    # retrieve the selected record. data is building's mongodb document id.
     if 'submit_save' in request.form:
         dbData = mongo.db.building.find_one({"_id": ObjectId(data)})
         bldgEdit = dbData
         print('returns mongo record')
         print(bldgEdit)
         return render_template("/bldg_update.html", data= bldgEdit)
+    # if delete is pressed delete document from Mongodb 
     elif 'submit_delete' in request.form:
         print("hit submit delete btn")
         dbData = mongo.db.building.remove({"_id": ObjectId(data)})
@@ -200,60 +230,61 @@ def bldg_edit():
     else:
         print("request button not found")
         return
-
-@app.route('/next_update', methods = ["GET", "POST"] )
-def next_update():
-    print('data received for acquisition page ...')
-    data = request.form['bldg_id']
-    print(data)
-    if data == "":
-        return redirect(url_for("propertyhome"))
-    dbData = mongo.db.building.find_one({"_id": ObjectId(data)})
-    bldgEdit = dbData
-    print('returns mongo record')
-    print(bldgEdit)
-    if 'info_formsave' in request.form:  #test code
-        print("found acqusition submit save button")
-        print(request.form['name'])
+    
+# failed attempt to all the editing on single, multiform html page.
+# @app.route('/next_update', methods = ["GET", "POST"] )
+# def next_update():
+#     print('data received for acquisition page ...')
+#     data = request.form['bldg_id']
+#     print(data)
+#     if data == "":
+#         return redirect(url_for("propertyhome"))
+#     dbData = mongo.db.building.find_one({"_id": ObjectId(data)})
+#     bldgEdit = dbData
+#     print('returns mongo record')
+#     print(bldgEdit)
+#     if 'info_formsave' in request.form:  #test code
+#         print("found acqusition submit save button")
+#         print(request.form['name'])
         
         
-        return render_template("/acq_update.html", data=bldgEdit)
-    elif 'acq_formsave' in request.form:
-        print("found capital submit save button")
-        if "improvements" in bldgEdit:
-            session['editdata'] = bldgEdit['improvements']
-        else:
-            session['editdata'] = []
-        return render_template("/cap_update.html", data= bldgEdit)
-    elif 'cap_formsave' in request.form:
-        print("found expense submit save button")
-        if "expense" in bldgEdit:
-            session['editdata'] = bldgEdit['expense']
-        else:
-            session['editdata'] = []
-        return render_template("/exp_update.html", data= bldgEdit)
-    elif 'exp_formsave' in request.form:
-        print("found expense submit save button")
-        if "tenants" in bldgEdit:
-            session['editdata'] = bldgEdit['tenants']
-        else:
-            session['editdata'] = []
-        return render_template("/tenants_update.html", data= bldgEdit)    
-    else:    
-        print("wrong sumbit button")
-        return render_template("/bldg_list.html")
-    return    
+#         return render_template("/acq_update.html", data=bldgEdit)
+#     elif 'acq_formsave' in request.form:
+#         print("found capital submit save button")
+#         if "improvements" in bldgEdit:
+#             session['editdata'] = bldgEdit['improvements']
+#         else:
+#             session['editdata'] = []
+#         return render_template("/cap_update.html", data= bldgEdit)
+#     elif 'cap_formsave' in request.form:
+#         print("found expense submit save button")
+#         if "expense" in bldgEdit:
+#             session['editdata'] = bldgEdit['expense']
+#         else:
+#             session['editdata'] = []
+#         return render_template("/exp_update.html", data= bldgEdit)
+#     elif 'exp_formsave' in request.form:
+#         print("found expense submit save button")
+#         if "tenants" in bldgEdit:
+#             session['editdata'] = bldgEdit['tenants']
+#         else:
+#             session['editdata'] = []
+#         return render_template("/tenants_update.html", data= bldgEdit)    
+#     else:    
+#         print("wrong sumbit button")
+#         return render_template("/bldg_list.html")
+#     return    
 
-# @app.route('/info_update/<id>')        
+# on edit info tab bldg_update.html, when any save button is clicked
 @app.route('/info_update', methods = ["POST"])
 def info_update():
-    
+    # retreive bldg id from page
     print('data received for info page ...')
     bldg_id = request.form['bldg_id']
     session['bldg_id'] = bldg_id
     print(bldg_id)
     print(request.form['bldg_name'])
-    
+    # save changed data, update mongodb document
     mongo.db.building.update({'_id': ObjectId(bldg_id)}, {"$set": 
         {
         "name": request.form['bldg_name'],
@@ -268,15 +299,18 @@ def info_update():
         "land": request.form['bldg_land'],
         # "type": request.form['bldg_type']
         }})
+    # reload updated data to info tab 
     dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
     bldgEdit = dbData
     print("return mongo data")
     print(bldgEdit)
+    # if save button click render info tab, save and exit click to home page.
     if 'info_formsave' in request.form: 
         return render_template("/bldg_update.html", data = bldgEdit)
     else: 
         return render_template("bldg_list.html")
 
+# for edit pages, build info tab from bldg_update.html
 @app.route('/info_update_tab')
 def info_update_tab():
     print('data received for info tab page ...')
@@ -289,6 +323,7 @@ def info_update_tab():
     print(bldgEdit)
     return render_template("/bldg_update.html", data = bldgEdit)
 
+# for edit a document  updates acquisition info a selected document
 @app.route('/acq_update', methods = ["POST"])
 def acq_update():
     print('data received for acq page ...')
@@ -315,6 +350,7 @@ def acq_update():
     else: 
         return render_template("bldg_list.html")
 
+# for edit pages builds acquisition tab
 @app.route('/acq_update_tab')
 def acq_update_tab():
     print('data received for acq tab page ...')
@@ -326,6 +362,7 @@ def acq_update_tab():
     print(bldgEdit)
     return render_template("/acq_update.html", data = bldgEdit)
       
+# for edit pages builds expense page for selected document   
 @app.route('/exp_update_tab', methods=['POST', 'GET'])
 def exp_update_tab():
     print('data received for exp tab page ...')
@@ -341,18 +378,22 @@ def exp_update_tab():
     print(bldgEdit)
     return render_template("/exp_update.html", data = bldgEdit)
 
+# for edit pages, updates expense data for selected mongodb document
 @app.route("/exp_update/data" , methods=['POST', 'GET'])    
 def exp_update_result():
     bldg_id = session['bldg_id']
+    # get json sent to it when save button clicked.  uses cap_update.js.
     data = request.get_json()
     print("ajax data recieved...")
     print(dumps(data))
+    # updates expense portion document a single list of dicts
     building = mongo.db.building
     building.update({'_id': ObjectId(bldg_id)},
         {"$set": {
         "expense": data['expense'],
         }})
     print("data inserted...")
+    # retrieve updated document so that update page is reloaded
     dbData = mongo.db.building.find_one({"_id": ObjectId(bldg_id)})
     bldgEdit = dbData
     print("return mongo data")
@@ -361,8 +402,10 @@ def exp_update_result():
     else:
         session['editdata'] = []
     print(bldgEdit)
+    # reloads current page
     return render_template("/exp_update.html", data = bldgEdit)
 
+# for edit function, capital page is built for selected document
 @app.route('/cap_update_tab', methods=['POST', 'GET'])
 def cap_update_tab():
     print('data received for cap tab page ...')
@@ -378,6 +421,7 @@ def cap_update_tab():
     print(bldgEdit)
     return render_template("/cap_update.html", data = bldgEdit)
 
+#  for edit pages, updated capital tab's data is saved and Mongodb updated
 @app.route("/cap_update/data" , methods=['POST', 'GET'])    
 def cap_update_result():
     bldg_id = session['bldg_id']
@@ -400,6 +444,7 @@ def cap_update_result():
     print(bldgEdit)
     return render_template("/cap_update.html", data = bldgEdit)
 
+# for edit pages, tenant tab is built for selected document
 @app.route('/tenants_update_tab', methods=['POST', 'GET'])
 def tenants_update_tab():
     print('data received for tenants tab page ...')
@@ -415,12 +460,14 @@ def tenants_update_tab():
     print(bldgEdit)
     return render_template("/tenants_update.html", data = bldgEdit)
 
+# similar to above, for edit pages the tenants tab mongodb is updated for selected record
 @app.route("/tenants_update/data" , methods=['POST', 'GET'])    
 def tenants_update_result():
     bldg_id = session['bldg_id']
     data = request.get_json()
     print("ajax tenants data recieved.../tenants_update/data ")
     print(dumps(data))
+    # updated rent lists are  nested in tenants list
     building = mongo.db.building
     building.update({'_id': ObjectId(bldg_id)},
         {"$set": {

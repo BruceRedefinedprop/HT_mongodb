@@ -1,3 +1,8 @@
+"""
+helper.py holds the template for a blank 
+building collection document.
+
+"""
 
 BLDGING = {
     'name': "railroad-flats",

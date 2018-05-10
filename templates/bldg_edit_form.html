@@ -1,11 +1,11 @@
- {% extends 'base.html'%} {% block content %} {% if status == "new"%}
+ {% extends 'base.html'%} {% block content %} 
+ 
  
  <!--<script type="text/javascript" src="static/js/bldgedit.js"></script>-->
 <input id="editbldgdata" type="hidden" name="editbldgdata"  value ="{{ bldgData }}" >
-<h3 class="header"> New Property</h3>
-{% else %}
-<h3 class="header"> Property Update</h2>
-    {% endif %}
+<h3 class="header"> New Property </h3>
+
+
     <!--tabs-->
     <div class="container"  id="bldg_edit_tabs">
         <div class="row">
@@ -36,43 +36,43 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="input-field col s5">
+                        <div class="input-field col m5 s12">
                             <input id="bldg_town" name="bldg_town" type="text" value={{bldgData.town}}>
                             <label>City</label>
                         </div>
-                        <div class="input-field col s3">
+                        <div class="input-field col m3 s12">
                             <input id="bldg_st" name="bldg_st" type="text" value={{bldgData.st}}>
                             <label>St. </label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col m4 s12">
                             <input id="bldg_zip" name="bldg_zip" type="text" value={{bldgData.zip}}>
                             <label>Zip</label>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="input-field col s4">
+                        <div class="input-field col m4 s12">
                             <input id="bldg_page" name="bldg_page" type="text" value={{bldgData.page}}>
                             <label>Page</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col m4 s12">
                             <input id="bldg_lot" name="bldg_lot" type="text" value={{bldgData.lot}}>
                             <label>Lot</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col m4 s12">
                             <input id="bldg_block" name="bldg_block" type="text" value={{bldgData.block}}>
                             <label>Block</label>
                         </div>
                     </div>
                     <div class="row" id="typeSize">
-                        <div class="input-field col s4">
+                        <div class="input-field col m4 s12">
                             <input id="bldg_gla" name="bldg_gla" type="text" value={{bldgData.gla}}>
                             <label>GLA (sf)</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col m4 s12">
                             <input id="bldg_land" name="bldg_land" type="text" value={{bldgData.land}}>
                             <label>Land (acre)</label>
                         </div>
-                        <div class="input-field col s4" id="bldg_type" value={{bldgData.type}} >
+                        <div class="input-field col m4 s12" id="bldg_type" value={{bldgData.type}} >
                             <select id="bldg_type" >
                           <option value="" disabled selected>Choose your option</option>
                           <option value="1">Industrial</option>
@@ -86,17 +86,17 @@
                 <div class="row" id="purchase">
                     <h4>Purchase</h4>
                     <div class="row">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="bldg_price" name="bldg_price" type="text" value={{ bldgData.contract_price }}>
                             <label>Contract Price</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6" >
                             <input id="bldg_noi" name="bldg_noi" type="text" value={{ bldgData.noi}}>
                             <label>Purchase NOI</label>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="input-field col s3">
+                        <div class="input-field col s12 m3">
                             <input id="bldg_cap" name="bldg_cap" type="text" value={{ bldgData.cap}}>
                             <label>Purchase CAP rate</label>
                         </div>
@@ -104,27 +104,27 @@
                     <hr>
                     <h4>Loan</h4>
                     <div class="row">
-                        <div class="input-field col s4">
+                        <div class="input-field col s12 m4">
                             <input id="bldg_bank" name="bldg_bank" type="text" value={{ bldgData.bank}}>
                             <label>Bank</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s12 m4">
                             <input id="bldg_ltv" name="bldg_ltv" type="text" value={{ bldgData.ltv}}>
                             <label>Loan to Value</label>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="input-field col s6">
+                        <div class="input-field col s12 m6">
                             <input id="bldg_loan_amt" name="bldg_loan_amt" type="text" value={{ bldgData.loan_amount}}>
                             <label>Amount</label>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="input-field col s4">
+                        <div class="input-field col s12 m4">
                             <input id="bank_loan_term" name="bldg_loan_term" type="text" value={{ bldgData.loan_term}}>
                             <label>Term</label>
                         </div>
-                        <div class="input-field col s4">
+                        <div class="input-field col s12 m4">
                             <input id="bank_loan_amort" name="bldg_loan_amort" type="text" value={{ bldgData.amort}}>
                             <label>Amortization Period</label>
                         </div>
@@ -183,9 +183,7 @@
 
     <script type="text/javascript" src="static/js/bldgedit.js"></script>
 
-    <script>
- $("h3").append("{{ bldgData.name }}");
- </script>
+
 
  
     {% endblock %}
