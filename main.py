@@ -230,51 +230,7 @@ def bldg_edit():
     else:
         print("request button not found")
         return
-    
-# failed attempt to all the editing on single, multiform html page.
-# @app.route('/next_update', methods = ["GET", "POST"] )
-# def next_update():
-#     print('data received for acquisition page ...')
-#     data = request.form['bldg_id']
-#     print(data)
-#     if data == "":
-#         return redirect(url_for("propertyhome"))
-#     dbData = mongo.db.building.find_one({"_id": ObjectId(data)})
-#     bldgEdit = dbData
-#     print('returns mongo record')
-#     print(bldgEdit)
-#     if 'info_formsave' in request.form:  #test code
-#         print("found acqusition submit save button")
-#         print(request.form['name'])
-        
-        
-#         return render_template("/acq_update.html", data=bldgEdit)
-#     elif 'acq_formsave' in request.form:
-#         print("found capital submit save button")
-#         if "improvements" in bldgEdit:
-#             session['editdata'] = bldgEdit['improvements']
-#         else:
-#             session['editdata'] = []
-#         return render_template("/cap_update.html", data= bldgEdit)
-#     elif 'cap_formsave' in request.form:
-#         print("found expense submit save button")
-#         if "expense" in bldgEdit:
-#             session['editdata'] = bldgEdit['expense']
-#         else:
-#             session['editdata'] = []
-#         return render_template("/exp_update.html", data= bldgEdit)
-#     elif 'exp_formsave' in request.form:
-#         print("found expense submit save button")
-#         if "tenants" in bldgEdit:
-#             session['editdata'] = bldgEdit['tenants']
-#         else:
-#             session['editdata'] = []
-#         return render_template("/tenants_update.html", data= bldgEdit)    
-#     else:    
-#         print("wrong sumbit button")
-#         return render_template("/bldg_list.html")
-#     return    
-
+ 
 # on edit info tab bldg_update.html, when any save button is clicked
 @app.route('/info_update', methods = ["POST"])
 def info_update():
