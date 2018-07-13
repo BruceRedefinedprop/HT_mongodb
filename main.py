@@ -69,7 +69,7 @@ def bldg_list_data():
     print('bldg list')
     temp = list(bldg)
     table = {'data': temp}
-    # print(table)
+    print(table)
     return dumps(table)
     
 
