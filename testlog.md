@@ -12,3 +12,6 @@ As I developed the program, I used print statements and console.log to test key 
 
 
 
+# Known issues
+
+Can remove dropbox sdk directory.  Get C9 access denied message.
