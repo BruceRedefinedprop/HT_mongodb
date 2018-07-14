@@ -65,8 +65,8 @@ function save_data() {
   jsBldgData['improvements'] = makeTenantArray('#cap_list');
   info_data();  
   acquisition_data();
-  console.log("make array");
-  console.log(JSON.stringify(jsBldgData));
+  // console.log("make array");
+  // console.log(JSON.stringify(jsBldgData));
 
 };
 
@@ -74,8 +74,8 @@ $(document).ready(function() {
 
 // puts bldgData record into hidden html input tag.
   var bldgData = $('#editbldgdata').val();
-  console.log("building data loaded")
-  console.log(bldgData)
+  // console.log("building data loaded")
+  // console.log(bldgData)
 // display info tab info only.
   $('#infoTab').on('click', function() {
     $('#info').css('display', 'block');
@@ -257,8 +257,8 @@ $(document).ready(function() {
     for (var i = 0; i < rowsdata.length; i++) {
       tenantarray[i] = rowsdata[i];
     };
-    console.log(tenantarray);
-    console.log(String(tenantnamedata.tenant_name));
+    // console.log(tenantarray);
+    // console.log(String(tenantnamedata.tenant_name));
 // reformat web page to show only rent table
     $('#info').hide();
     $('#purchase').hide();
@@ -342,20 +342,20 @@ $(document).ready(function() {
     // test code to verify that rent data for specific tenant collected.
     console.log(rowsdata);
     var tenantName = tenantnamedata.tenant_name;
-    console.log("1. tenant is " + tenantName);
+    // console.log("1. tenant is " + tenantName);
     
     if (jsBldgData['tenants'] != []) {
       // Stores rent data into previously selected tenant
-      console.log("there are tenants");
+      // console.log("there are tenants");
       for (i = 0; i < jsBldgData['tenants'].length; i++) {
         console.log(i);
         // searches for matching tenant and stores new rent into array
         if (jsBldgData['tenants'][i]['tenant_name'] === tenantnamedata.tenant_name) {
-          console.log("2. tenant is " + tenantName);
+          // console.log("2. tenant is " + tenantName);
           var rentrow = [];
           // Strip circular references
           for (j = 0; j < rowsdata.length; j++) {
-            console.log("striping data");
+            // console.log("striping data");
             rentrow[j] = rowsdata[j]
           };
           console.log("rows data");
@@ -365,8 +365,8 @@ $(document).ready(function() {
         };
       }
       // test code
-      console.log("updated tenant");
-      console.log(JSON.stringify(jsBldgData))
+      // console.log("updated tenant");
+      // console.log(JSON.stringify(jsBldgData))
     }
     else {
       // inserts blank rent into first tenants tenant position
@@ -378,8 +378,8 @@ $(document).ready(function() {
         rentrow[i] = rowsdata[i];
       };
       jsBldgData['tenants'][0]['rents'] = rentrow;
-      console.log("new tenant");
-      console.log(JSON.stringify(jsBldgData));
+      // console.log("new tenant");
+      // console.log(JSON.stringify(jsBldgData));
       rentDataTable.draw();
     };
     // restores tenant page, draws empty rent table for future use.
