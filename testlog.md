@@ -11,7 +11,6 @@ Likewise, sample set of Jasmine tests were used to verify that a DataTables can 
 As I developed the program, I used print statements and console.log to test key variables through the program.  Some of these statements are left in code, which I know should not be done in production code. I left them in for purpose of your evaluation so that you see what data I was viewing during my development process. To solve the AJAX testing quesetion, I looked into using Sinon JS and perhaps in future iteration I would use it.  However, without a test framework to spoof the server, it just seem easier to use console.log to view the data leaving javascript and print statement to compare it with data arriving in python.   To test the data going the other direction from python to javascript Datatable made such a test obvious, since the data would show up nicely in the datatable.  To verify that database IDs were correct was simple.  All I had to do was expose ID field in the DataTable.
 
 
-
 # Known issues
 
 Can remove dropbox sdk directory.  Get C9 access denied message.
